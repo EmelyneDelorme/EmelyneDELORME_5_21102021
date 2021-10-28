@@ -18,6 +18,7 @@ fetch("http://localhost:3000/api/products/")
   });
 
 function createKanapCard(kanap) {
+  console.log(kanap.name);
   // Creer le lien associée au produit
   const anchorItem = document.createElement("a");
   let sectionItem = document.getElementById("items");

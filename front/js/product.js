@@ -1,4 +1,5 @@
 function createKanapPage(kanap) {
+  console.log("createKanapPage");
   // Creer l'image
   const imgItem = document.createElement("img");
   let imgClassItem = document.getElementsByClassName("item__img");
@@ -32,10 +33,38 @@ function createKanapPage(kanap) {
   }
 }
 
-function getProductById(id) {}
+function getColorQuantity() {
+  // Récupérer la couleur choisie
+  const select = document.getElementById("colors");
+  document.addEventListener("change", function (e) {
+    let color = select.value;
+    console.log("couleur choisie");
+    console.log(color);
+    selectedKanap.color = color;
+  });
+
+  // Récupérer la quantité choisie
+  const quantity = document.getElementById("quantity");
+  document.addEventListener("change", function (e) {
+    let qte = quantity.value;
+    console.log("quantité choisie");
+    console.log(qte);
+    selectedKanap.qte = qte;
+  });
+}
+
 let page = window.location.href;
 let url = new URL(page);
 let id = url.searchParams.get("id");
+let selectedKanap = {
+  imageUrl: "",
+  altTxt: "",
+  name: "",
+  price: "",
+  id: "",
+  qte: "",
+  color: "",
+};
 console.log(id);
 
 fetch("http://localhost:3000/api/products/" + id)
@@ -46,10 +75,50 @@ fetch("http://localhost:3000/api/products/" + id)
   })
   .then(function (value) {
     const kanap = value;
-    console.log(kanap);
     createKanapPage(kanap);
+    getColorQuantity();
+    console.log(kanap);
+    selectedKanap.imageUrl = kanap.imageUrl;
+    selectedKanap.altTxt = kanap.altTxt;
+    selectedKanap.name = kanap.name;
+    selectedKanap.price = kanap.price;
+    selectedKanap.id = kanap._id;
+    // Changer le nom de l'onglet
+    let titleItem = document.getElementsByTagName("title");
+    titleItem[0].innerText = kanap.name;
   })
-
   .catch(function (err) {
     console.log("error API response");
   });
+
+// // Récupérer le click du bouton v1
+// const elt = document.getElementById("addToCart");
+// elt.addEventListener("click", function () {
+//   console.log("cliqué!");
+//   console.log(selectedKanap);
+//   let kanapToCart = JSON.stringify(selectedKanap);
+//   localStorage.setItem("Cart", kanapToCart);
+// });
+
+// Récupérer le click du bouton
+const elt = document.getElementById("addToCart");
+elt.addEventListener("click", function () {
+  console.log("addEventListener", selectedKanap);
+
+  if (selectedKanap.qte == 0) {
+    alert("Renseignez la quantité");
+  } else if (selectedKanap.color.length == 0) {
+    alert("Renseignez la couleur");
+  } else {
+    let tableau = JSON.parse(localStorage.getItem("cart"));
+    if (tableau === null) {
+      localStorage.setItem("cart", JSON.stringify([]));
+      tableau = JSON.parse(localStorage.getItem("cart"));
+    }
+    tableau.push(selectedKanap);
+
+    let kanapToCart = JSON.stringify(tableau);
+    localStorage.setItem("cart", kanapToCart);
+    console.log("cliqué!");
+  }
+});
